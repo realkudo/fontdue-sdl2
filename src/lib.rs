@@ -129,6 +129,15 @@ impl FontTexture<'_> {
         })
     }
 
+    pub fn draw_text<RT: RenderTarget>(
+        &mut self,
+        canvas: &mut Canvas<RT>,
+        fonts: &[Font],
+        glyphs: &[GlyphPosition<Color>],
+    ) -> Result<(), String> {
+        self.draw_text_at(canvas, fonts, glyphs, 0, 0)
+    }
+
     /// Renders text to the given canvas, using the given fonts and
     /// glyphs.
     ///
@@ -149,11 +158,13 @@ impl FontTexture<'_> {
     /// circumstances, so text rendering is interrupted by these
     /// errors. The Err(String) will contain an informational string
     /// from SDL.
-    pub fn draw_text<RT: RenderTarget>(
+    pub fn draw_text_at<RT: RenderTarget>(
         &mut self,
         canvas: &mut Canvas<RT>,
         fonts: &[Font],
         glyphs: &[GlyphPosition<Color>],
+        offset_x: i32,
+        offset_y: i32,
     ) -> Result<(), String> {
         struct RenderableGlyph {
             texture_rect: Rect,
@@ -172,8 +183,8 @@ impl FontTexture<'_> {
             .filter(|glyph| glyph.width * glyph.height > 0)
         {
             let canvas_rect = Rect::new(
-                glyph.x as i32,
-                glyph.y as i32,
+                glyph.x as i32  + offset_x,
+                glyph.y as i32 + offset_y,
                 glyph.width as u32,
                 glyph.height as u32,
             );
